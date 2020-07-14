@@ -17,6 +17,7 @@ namespace SportsStore
     public class Startup
     {
         private IConfiguration Configuration { get; set; }
+        
         public Startup(IConfiguration config)
         {
             Configuration = config;
