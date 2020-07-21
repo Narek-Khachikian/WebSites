@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Routing;
+using Platform.Services;
 
 namespace Platform
 {
@@ -19,9 +20,9 @@ namespace Platform
         public void ConfigureServices(IServiceCollection services)
         {
             //services.Configure<MessageOptions>(opt => opt.CityName = "Moscow");
-            services.Configure<RouteOptions>(opt =>
-            opt.ConstraintMap.Add("countryName",typeof(CountryRouteConstraint))
-            );
+            //services.Configure<RouteOptions>(opt =>
+            //opt.ConstraintMap.Add("countryName",typeof(CountryRouteConstraint))
+            //);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -41,31 +42,60 @@ namespace Platform
             //});
             app.UseRouting();
 
+            app.UseMiddleware<WeatherMiddleware>();
+
+            IResponseFormatter formater = new TextResponseFormater();
             app.Use(async (context, next) =>
             {
-                Endpoint end = context.GetEndpoint();
-                await context.Response.WriteAsync($"used {end.DisplayName}");
-                await next();
+                if(context.Request.Path == "/middleware/function")
+                {
+                    await formater.Format(context,"Middleware Function: It is snowing in Chicago");
+                }
+                else
+                {
+                    await next();
+                }
             });
 
             app.UseEndpoints(endpoint =>
             {
-                endpoint.MapGet("{first:countryName}/{sec:bool?}/{third:length(10)?}/{*catchall}", async context =>
+                endpoint.MapGet("/endpoint/class", WeatherEndpoint.Endpoint);
+                endpoint.MapGet("/endpoint/function", async context =>
                 {
-                    foreach(var item in context.Request.RouteValues)
-                    {
-                        if(item.Value != null)
-                        {
-                            await context.Response.WriteAsync($"Key:{item.Key} - Value:{item.Value}\n");
-                        }
-                    }
-                }).WithDisplayName("main Endpoint\n")/*.Add(endpointBuilder => ((RouteEndpointBuilder)endpointBuilder).Order = 1)*/;
-
-                endpoint.MapFallback(async context =>
-                {
-                    await context.Response.WriteAsync("Error path");
-                }).WithDisplayName("fallback endpoint\n");
+                    await context.Response.WriteAsync("Endpoint Function: it is sunny in LA");
+                });
             });
+
+            app.Run(async context =>
+            {
+                await context.Response.WriteAsync("\nTerminal end reached");
+            });
+
+            //app.Use(async (context, next) =>
+            //{
+            //    Endpoint end = context.GetEndpoint();
+            //    await context.Response.WriteAsync($"used {end.DisplayName}");
+            //    await next();
+            //});
+
+            //app.UseEndpoints(endpoint =>
+            //{
+            //    endpoint.MapGet("{first:countryName}/{sec:bool?}/{third:length(10)?}/{*catchall}", async context =>
+            //    {
+            //        foreach(var item in context.Request.RouteValues)
+            //        {
+            //            if(item.Value != null)
+            //            {
+            //                await context.Response.WriteAsync($"Key:{item.Key} - Value:{item.Value}\n");
+            //            }
+            //        }
+            //    }).WithDisplayName("main Endpoint\n")/*.Add(endpointBuilder => ((RouteEndpointBuilder)endpointBuilder).Order = 1)*/;
+
+            //    endpoint.MapFallback(async context =>
+            //    {
+            //        await context.Response.WriteAsync("Error path");
+            //    }).WithDisplayName("fallback endpoint\n");
+            //});
             //app.UseEndpoints(endpoint =>
             //{
             //    endpoint.MapGet("files/{name}.{ext}", async context =>
@@ -82,10 +112,6 @@ namespace Platform
             //    .WithMetadata(new RouteNameMetadata("population"));
             //});
 
-            app.Run(async context =>
-            {
-                await context.Response.WriteAsync("\nTerminal end reached");
-            });
 
             //app.UseEndpoints(endpoint => {
             //    endpoint.MapGet("endpoint", async context =>
