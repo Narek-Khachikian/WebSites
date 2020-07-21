@@ -32,7 +32,10 @@ namespace Platform
                 await context.Response.WriteAsync($"City Name: {options.CityName}, Country:{options.CountryName}\n");
             }
 
-            await next(context);
+            if (next != null)
+            {
+                await next(context);
+            }
             await context.Response.WriteAsync("\nLalalala");
         }
     }

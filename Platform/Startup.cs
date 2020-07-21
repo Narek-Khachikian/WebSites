@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Routing;
 
 namespace Platform
 {
@@ -17,7 +18,10 @@ namespace Platform
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<MessageOptions>(opt => opt.CityName = "Moscow");
+            //services.Configure<MessageOptions>(opt => opt.CityName = "Moscow");
+            services.Configure<RouteOptions>(opt =>
+            opt.ConstraintMap.Add("countryName",typeof(CountryRouteConstraint))
+            );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -28,8 +32,82 @@ namespace Platform
                 app.UseDeveloperExceptionPage();
             }
 
-            app.MapWhen(context => context.Request.Query["custom"] == "true", app =>
-                app.UseMiddleware<QueryStringMiddleWare>());
+            //app.UseMiddleware<Population>();
+            //app.UseMiddleware<Capital>();
+            //app.Use(async (context, next) =>
+            //{
+            //    await context.Response.WriteAsync("Hello\n");
+            //    await next();
+            //});
+            app.UseRouting();
+
+            app.Use(async (context, next) =>
+            {
+                Endpoint end = context.GetEndpoint();
+                await context.Response.WriteAsync($"used {end.DisplayName}");
+                await next();
+            });
+
+            app.UseEndpoints(endpoint =>
+            {
+                endpoint.MapGet("{first:countryName}/{sec:bool?}/{third:length(10)?}/{*catchall}", async context =>
+                {
+                    foreach(var item in context.Request.RouteValues)
+                    {
+                        if(item.Value != null)
+                        {
+                            await context.Response.WriteAsync($"Key:{item.Key} - Value:{item.Value}\n");
+                        }
+                    }
+                }).WithDisplayName("main Endpoint\n")/*.Add(endpointBuilder => ((RouteEndpointBuilder)endpointBuilder).Order = 1)*/;
+
+                endpoint.MapFallback(async context =>
+                {
+                    await context.Response.WriteAsync("Error path");
+                }).WithDisplayName("fallback endpoint\n");
+            });
+            //app.UseEndpoints(endpoint =>
+            //{
+            //    endpoint.MapGet("files/{name}.{ext}", async context =>
+            //    {
+            //        if(context.Request.RouteValues["ext"] as string == "exe")
+            //        {
+            //            await context.Response.WriteAsync("It is an exe\n");
+            //        }
+            //        await context.Response.WriteAsync($"You can dounload the " +
+            //            $"{context.Request.RouteValues["name"].ToString() + "." + context.Request.RouteValues["ext"].ToString()} now...");
+            //    });
+            //    //endpoint.MapGet("capital/{country}", CapitalStat.Endpoint);
+            //    endpoint.MapGet("size/{city?}", PopulationStat.Endpoint)
+            //    .WithMetadata(new RouteNameMetadata("population"));
+            //});
+
+            app.Run(async context =>
+            {
+                await context.Response.WriteAsync("\nTerminal end reached");
+            });
+
+            //app.UseEndpoints(endpoint => {
+            //    endpoint.MapGet("endpoint", async context =>
+            //    {
+            //        await context.Response.WriteAsync("\nEndpoint\n");
+            //    });
+            //    endpoint.MapGet("{a}/{b}", async context =>
+            //    {
+            //        foreach (var item in context.Request.RouteValues)
+            //        {
+            //            await context.Response.WriteAsync(item.Key + " : " + item.Value.ToString());
+            //        }
+            //    });
+            //    //endpoint.MapGet("{a}/{b}", new Capital().Invoke);
+            //    //endpoint.MapGet("population/paris", new Population().Invoke);
+            //});
+
+
+
+
+            //app.MapWhen(context => context.Request.Query["custom"] == "true", app =>
+            //    app.UseMiddleware<QueryStringMiddleWare>());
 
             //app.Use(async (context, next) =>
             //{
@@ -91,15 +169,15 @@ namespace Platform
 
             //app.UseMiddleware<QueryStringMiddleWare>("Narek");
 
-            app.UseRouting();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Hello World!");
-                });
-            });
+
+            //app.UseEndpoints(endpoints =>
+            //{
+            //    endpoints.MapGet("/", async context =>
+            //    {
+            //        await context.Response.WriteAsync("Hello World!");
+            //    });
+            //});
         }
     }
 }
