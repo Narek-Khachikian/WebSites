@@ -23,10 +23,12 @@ namespace Platform
             //services.Configure<RouteOptions>(opt =>
             //opt.ConstraintMap.Add("countryName",typeof(CountryRouteConstraint))
             //);
+            services.AddSingleton<IResponseFormatter, HtmlResponseFormater>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IOptions<MessageOptions> msgOptions)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IOptions<MessageOptions> msgOptions,
+            IResponseFormatter formater)
         {
             if (env.IsDevelopment())
             {
@@ -44,7 +46,7 @@ namespace Platform
 
             app.UseMiddleware<WeatherMiddleware>();
 
-            IResponseFormatter formater = new TextResponseFormater();
+            //IResponseFormatter formater = new TextResponseFormater();
             app.Use(async (context, next) =>
             {
                 if(context.Request.Path == "/middleware/function")
@@ -59,10 +61,11 @@ namespace Platform
 
             app.UseEndpoints(endpoint =>
             {
-                endpoint.MapGet("/endpoint/class", WeatherEndpoint.Endpoint);
+                //endpoint.MapGet("/endpoint/class", WeatherEndpoint.Endpoint);
+                endpoint.MapWeather("/endpoint/class");
                 endpoint.MapGet("/endpoint/function", async context =>
                 {
-                    await context.Response.WriteAsync("Endpoint Function: it is sunny in LA");
+                    await formater.Format(context,"Endpoint Function: it is sunny in LA");
                 });
             });
 
