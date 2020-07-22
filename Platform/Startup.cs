@@ -24,25 +24,51 @@ namespace Platform
             Config = configuration;
         }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+        
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<MessageOptions>(Config.GetSection("Location"));
+
+
             //services.Configure<MessageOptions>(opt => opt.CityName = "Moscow");
             //services.Configure<RouteOptions>(opt =>
             //opt.ConstraintMap.Add("countryName",typeof(CountryRouteConstraint))
             //);
-            services.AddScoped<IResponseFormatter, TimeResponseFormater>();
-            services.AddScoped<ITimeStamp, DefaultTimeStamp>();
+            //services.AddScoped<IResponseFormatter, TimeResponseFormater>();
+            //services.AddScoped<ITimeStamp, DefaultTimeStamp>();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IOptions<MessageOptions> msgOptions)
+        
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseRouting();
+
+            app.UseMiddleware<LocationMiddleware>();
+
+            app.Use(async (context, next) =>
+            {
+                string str = Config["Logging:LogLevel:Default"];
+                await context.Response.WriteAsync("microsoft log level is : " + str + "\n");
+                string envMode = Config["ASPNETCORE_ENVIRONMENT"];
+                await context.Response.WriteAsync($"The env setting is: {envMode}\n");
+                string envMode1 = Config["WebService:Id"];
+                await context.Response.WriteAsync($"The env setting is: {envMode1}\n");
+                await next();
+            });
+
+            app.UseEndpoints(endpoint =>
+            {
+                endpoint.MapGet("/", async context =>
+                {
+                    await context.Response.WriteAsync("Hello World");
+                });
+            });
+
+
 
             //app.UseMiddleware<Population>();
             //app.UseMiddleware<Capital>();
@@ -51,39 +77,39 @@ namespace Platform
             //    await context.Response.WriteAsync("Hello\n");
             //    await next();
             //});
-            app.UseRouting();
 
-            app.UseMiddleware<WeatherMiddleware>();
+
+            //app.UseMiddleware<WeatherMiddleware>();
 
             //IResponseFormatter formater = new TextResponseFormater();
-            app.Use(async (context, next) =>
-            {
-                if(context.Request.Path == "/middleware/function")
-                {
-                    IResponseFormatter formater = context.RequestServices.GetService<IResponseFormatter>();
-                    await formater.Format(context,"Middleware Function: It is snowing in Chicago");
-                }
-                else
-                {
-                    await next();
-                }
-            });
+            //app.Use(async (context, next) =>
+            //{
+            //    if(context.Request.Path == "/middleware/function")
+            //    {
+            //        IResponseFormatter formater = context.RequestServices.GetService<IResponseFormatter>();
+            //        await formater.Format(context,"Middleware Function: It is snowing in Chicago");
+            //    }
+            //    else
+            //    {
+            //        await next();
+            //    }
+            //});
 
-            app.UseEndpoints(endpoint =>
-            {
-                //endpoint.MapGet("/endpoint/class", WeatherEndpoint.Endpoint);
-                endpoint.MapEndpoint<WeatherEndpoint>("/endpoint/class","Endpoint2");
-                endpoint.MapGet("/endpoint/function", async context =>
-                {
-                    IResponseFormatter formater = context.RequestServices.GetService<IResponseFormatter>();
-                    await formater.Format(context,"Endpoint Function: it is sunny in LA");
-                });
-            });
+            //app.UseEndpoints(endpoint =>
+            //{
+            //    //endpoint.MapGet("/endpoint/class", WeatherEndpoint.Endpoint);
+            //    endpoint.MapEndpoint<WeatherEndpoint>("/endpoint/class","Endpoint2");
+            //    endpoint.MapGet("/endpoint/function", async context =>
+            //    {
+            //        IResponseFormatter formater = context.RequestServices.GetService<IResponseFormatter>();
+            //        await formater.Format(context,"Endpoint Function: it is sunny in LA");
+            //    });
+            //});
 
-            app.Run(async context =>
-            {
-                await context.Response.WriteAsync("\nTerminal end reached");
-            });
+            //app.Run(async context =>
+            //{
+            //    await context.Response.WriteAsync("\nTerminal end reached");
+            //});
 
             //app.Use(async (context, next) =>
             //{
