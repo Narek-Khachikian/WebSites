@@ -10,11 +10,20 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Routing;
 using Platform.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace Platform
 {
     public class Startup
     {
+
+        private IConfiguration Config;
+
+        public Startup(IConfiguration configuration)
+        {
+            Config = configuration;
+        }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -23,12 +32,12 @@ namespace Platform
             //services.Configure<RouteOptions>(opt =>
             //opt.ConstraintMap.Add("countryName",typeof(CountryRouteConstraint))
             //);
-            services.AddSingleton<IResponseFormatter, HtmlResponseFormater>();
+            services.AddScoped<IResponseFormatter, TimeResponseFormater>();
+            services.AddScoped<ITimeStamp, DefaultTimeStamp>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IOptions<MessageOptions> msgOptions,
-            IResponseFormatter formater)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IOptions<MessageOptions> msgOptions)
         {
             if (env.IsDevelopment())
             {
@@ -51,6 +60,7 @@ namespace Platform
             {
                 if(context.Request.Path == "/middleware/function")
                 {
+                    IResponseFormatter formater = context.RequestServices.GetService<IResponseFormatter>();
                     await formater.Format(context,"Middleware Function: It is snowing in Chicago");
                 }
                 else
@@ -62,9 +72,10 @@ namespace Platform
             app.UseEndpoints(endpoint =>
             {
                 //endpoint.MapGet("/endpoint/class", WeatherEndpoint.Endpoint);
-                endpoint.MapWeather("/endpoint/class");
+                endpoint.MapEndpoint<WeatherEndpoint>("/endpoint/class","Endpoint2");
                 endpoint.MapGet("/endpoint/function", async context =>
                 {
+                    IResponseFormatter formater = context.RequestServices.GetService<IResponseFormatter>();
                     await formater.Format(context,"Endpoint Function: it is sunny in LA");
                 });
             });

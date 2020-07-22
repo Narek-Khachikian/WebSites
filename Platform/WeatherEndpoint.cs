@@ -10,10 +10,22 @@ namespace Platform
 {
     public class WeatherEndpoint
     {
-        public static async Task Endpoint(HttpContext context, IResponseFormatter formater)
+        private IResponseFormatter formater;
+
+        public WeatherEndpoint(IResponseFormatter formater)
+        {
+            this.formater = formater;
+        }
+
+        public async Task Endpoint(HttpContext context)
         {
             //IResponseFormatter formater = context.RequestServices.GetRequiredService<IResponseFormatter>();
             await formater.Format(context,"Endpoint, it is cloudy in London");
+        }
+
+        public async Task Endpoint2(HttpContext context)
+        {
+            await formater.Format(context, "Endpoint2, it is cloudy but hot in Yerevan");
         }
     }
 }
