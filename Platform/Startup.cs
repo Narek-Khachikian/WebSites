@@ -11,6 +11,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Routing;
 using Platform.Services;
 using Microsoft.Extensions.Configuration;
+using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 
 namespace Platform
 {
@@ -28,8 +30,8 @@ namespace Platform
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<MessageOptions>(Config.GetSection("Location"));
-
-
+            
+            
             //services.Configure<MessageOptions>(opt => opt.CityName = "Moscow");
             //services.Configure<RouteOptions>(opt =>
             //opt.ConstraintMap.Add("countryName",typeof(CountryRouteConstraint))
@@ -39,36 +41,38 @@ namespace Platform
         }
 
         
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseStaticFiles(new StaticFileOptions() { RequestPath = "/file" });
             app.UseRouting();
 
-            app.UseMiddleware<LocationMiddleware>();
-
-            app.Use(async (context, next) =>
-            {
-                string str = Config["Logging:LogLevel:Default"];
-                await context.Response.WriteAsync("microsoft log level is : " + str + "\n");
-                string envMode = Config["ASPNETCORE_ENVIRONMENT"];
-                await context.Response.WriteAsync($"The env setting is: {envMode}\n");
-                string envMode1 = Config["WebService:Id"];
-                await context.Response.WriteAsync($"The env setting is: {envMode1}\n");
-                await next();
-            });
+            //app.UseMiddleware<LocationMiddleware>();
 
             app.UseEndpoints(endpoint =>
             {
                 endpoint.MapGet("/", async context =>
                 {
+                    logger.LogDebug("Response for / started");
                     await context.Response.WriteAsync("Hello World");
+                    logger.LogDebug("Response for / finished");
                 });
             });
 
-
+            //app.Use(async (context, next) =>
+            //{
+            //    string str = Config["Logging:LogLevel:Default"];
+            //    await context.Response.WriteAsync("microsoft log level is : " + str + "\n");
+            //    string envMode = Config["ASPNETCORE_ENVIRONMENT"];
+            //    await context.Response.WriteAsync($"The env setting is: {envMode}\n");
+            //    string envMode1 = Config["WebService:Id"];
+            //    await context.Response.WriteAsync($"The env setting is: {envMode1}\n");
+            //    await next();
+            //});
 
             //app.UseMiddleware<Population>();
             //app.UseMiddleware<Capital>();
