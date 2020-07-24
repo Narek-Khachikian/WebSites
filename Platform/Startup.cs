@@ -29,7 +29,10 @@ namespace Platform
         
         public void ConfigureServices(IServiceCollection services)
         {
-
+            services.AddDistributedMemoryCache(opt =>
+            {
+                opt.SizeLimit = 200;
+            });
             //services.Configure<CookiePolicyOptions>(opt =>
             //{ opt.CheckConsentNeeded = context => true;});
 
@@ -88,6 +91,7 @@ namespace Platform
 
             app.UseEndpoints(endpoint =>
             {
+                endpoint.MapEndpoint<SumEndpoint>("/sum/{count:int=1000000000}");
                 endpoint.MapGet("/", async context =>
                 {
                     await context.Response.WriteAsync("Hello world from endpoint\n");
