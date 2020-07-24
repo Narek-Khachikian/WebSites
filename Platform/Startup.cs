@@ -30,22 +30,22 @@ namespace Platform
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.Configure<CookiePolicyOptions>(opt =>
-            { opt.CheckConsentNeeded = context => true;});
+            //services.Configure<CookiePolicyOptions>(opt =>
+            //{ opt.CheckConsentNeeded = context => true;});
 
-            services.AddDistributedMemoryCache();
+            //services.AddDistributedMemoryCache();
 
-            services.AddSession(option =>
-            {
-                option.IdleTimeout = TimeSpan.FromMinutes(30);
-                option.Cookie.IsEssential = true;
-            });
+            //services.AddSession(option =>
+            //{
+            //    option.IdleTimeout = TimeSpan.FromMinutes(30);
+            //    option.Cookie.IsEssential = true;
+            //});
 
-            services.AddHsts(options =>
-            {
-                options.MaxAge = TimeSpan.FromDays(1);
-                options.IncludeSubDomains = true;
-            });
+            //services.AddHsts(options =>
+            //{
+            //    options.MaxAge = TimeSpan.FromDays(1);
+            //    options.IncludeSubDomains = true;
+            //});
 
             //services.AddHttpsRedirection(opt =>
             //{
@@ -67,52 +67,60 @@ namespace Platform
         
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            //if (env.IsDevelopment())
-            //{
-            //    app.UseDeveloperExceptionPage();
-            //}
-            app.UseExceptionHandler("/error.html");
-            if (env.IsProduction())
+            if (env.IsDevelopment())
             {
-                app.UseHsts();
+                app.UseDeveloperExceptionPage();
             }
+            //app.UseExceptionHandler("/error.html");
+            //if (env.IsProduction())
+            //{
+            //    app.UseHsts();
+            //}
 
-            app.UseHttpsRedirection();
-            app.UseStatusCodePages("text/html", ResponseSetting.DefaultResponse);
+            //app.UseHttpsRedirection();
+            //app.UseStatusCodePages("text/html", ResponseSetting.DefaultResponse);
 
-            app.UseCookiePolicy();
-            app.UseMiddleware<ConsentMiddleware>();
-            app.UseSession();
+            //app.UseCookiePolicy();
+            //app.UseMiddleware<ConsentMiddleware>();
+            //app.UseSession();
             app.UseStaticFiles();
             app.UseRouting();
 
-            app.Use(async (context, next) =>
+            app.UseEndpoints(endpoint =>
             {
-                if(context.Request.Path == "/error")
+                endpoint.MapGet("/", async context =>
                 {
-                    context.Response.StatusCode = StatusCodes.Status404NotFound;
-                    await Task.CompletedTask;
-                }
-                else
-                {
-                    await next();
-                }
+                    await context.Response.WriteAsync("Hello world from endpoint\n");
+                });
             });
 
-            app.Run(context =>
-            {
-                throw new Exception("A test exception");
-            });
+            //app.Use(async (context, next) =>
+            //{
+            //    if(context.Request.Path == "/error")
+            //    {
+            //        context.Response.StatusCode = StatusCodes.Status404NotFound;
+            //        await Task.CompletedTask;
+            //    }
+            //    else
+            //    {
+            //        await next();
+            //    }
+            //});
 
-            app.Use(async (context, next) => 
-            {
-                await context.Response.WriteAsync($"HTTPS request? {context.Request.IsHttps}");
-                if (context.Request.IsHttps)
-                {
-                    await context.Response.WriteAsync("\nThis is a response to HTTPS request");
-                }
-                await next();
-            });
+            //app.Run(context =>
+            //{
+            //    throw new Exception("A test exception");
+            //});
+
+            //app.Use(async (context, next) => 
+            //{
+            //    await context.Response.WriteAsync($"HTTPS request? {context.Request.IsHttps}");
+            //    if (context.Request.IsHttps)
+            //    {
+            //        await context.Response.WriteAsync("\nThis is a response to HTTPS request");
+            //    }
+            //    await next();
+            //});
 
             
             app.UseEndpoints(endpoint =>
@@ -150,7 +158,7 @@ namespace Platform
 
                 endpoint.MapFallback(async context =>
                 {
-                    await context.Response.WriteAsync("\nHello world");
+                    await context.Response.WriteAsync("Hello world\n");
                 });
             });
             //app.UseMiddleware<LocationMiddleware>();
