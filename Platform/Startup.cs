@@ -19,20 +19,27 @@ namespace Platform
     public class Startup
     {
 
-        //private IConfiguration Config;
+        private IConfiguration Config;
 
-        //public Startup(IConfiguration configuration)
-        //{
-        //    Config = configuration;
-        //}
+        public Startup(IConfiguration configuration)
+        {
+            Config = configuration;
+        }
 
-        
+
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDistributedMemoryCache(opt =>
+            services.AddDistributedSqlServerCache(opt =>
             {
-                opt.SizeLimit = 200;
+                opt.ConnectionString = Config["ConnectionString:CacheConnection"];
+                opt.DefaultSlidingExpiration = TimeSpan.FromMinutes(2);
+                opt.SchemaName = "dbo";
+                opt.TableName = "DataCache";
             });
+            //services.AddDistributedMemoryCache(opt =>
+            //{
+            //    opt.SizeLimit = 200;
+            //});
             //services.Configure<CookiePolicyOptions>(opt =>
             //{ opt.CheckConsentNeeded = context => true;});
 
