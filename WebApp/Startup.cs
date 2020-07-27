@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore.SqlServer;
 using WebApp.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace WebApp
 {
@@ -32,6 +33,9 @@ namespace WebApp
                 opt.UseSqlServer(Configuration["ConnectionString:ProductConnection"]);
                 opt.EnableSensitiveDataLogging(true);
             });
+
+
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,14 +49,20 @@ namespace WebApp
             app.UseRouting();
 
             app.UseMiddleware<TestMiddleware>();
+            
+            
 
             app.UseEndpoints(endpoints =>
             {
-                
+                //endpoints.MapWebService();
+
                 endpoints.MapGet("/", async context =>
                 {
                     await context.Response.WriteAsync("Hello World!");
                 });
+
+                endpoints.MapControllers();
+
             });
 
             SeedData.SeedDatabase(dbContext);
