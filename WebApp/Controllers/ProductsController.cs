@@ -9,6 +9,7 @@ using System.Diagnostics;
 
 namespace WebApp.Controllers
 {
+    [ApiController]
     [Route("api/[controller]")]
     public class ProductsController : ControllerBase
     {
@@ -20,46 +21,54 @@ namespace WebApp.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<Product> GetProducts()
+        public IAsyncEnumerable<Product> GetProducts()
         {
             return dbContext.Products;
         }
 
         [HttpGet("{Id:long}")]
-        public Product GetProduct([FromServices] ILogger<ProductsController> logger, long Id)
+        public async Task<IActionResult> GetProduct(long Id)
         {
-            logger.LogDebug("get product action invoked");
-            //long Id = long.Parse(HttpContext.Request.RouteValues["Id"] as string);
-            return dbContext.Products.Find(Id);
+            Product p = await dbContext.Products.FindAsync(Id);
+            if(p == null)
+            {
+                return NotFound();
+            }
+            return Ok(p);
+        }
+
+        [HttpGet("redirect")]
+        public IActionResult Redirect()
+        {
+            return RedirectToAction(nameof(GetProduct),new { Id = 1 });
         }
 
         [HttpPost]
-        public async Task PostProduct([FromBody] Product product)
+        public async Task<IActionResult> PostProduct(ProductBindingTarget target)
         {
-            dbContext.Add(product);
-            await dbContext.SaveChangesAsync();
+            if (ModelState.IsValid)
+            {
+                Product p = target.ToProduct();
+                await dbContext.Products.AddAsync(p);
+                await dbContext.SaveChangesAsync();
+                return Ok(p);
+            }
+            return BadRequest(ModelState);
+            
         }
 
         [HttpPut]
-        public void PutProduct([FromBody] Product product)
+        public async Task PutProduct(Product product)
         {
             dbContext.Products.Update(product);
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
         }
 
         [HttpDelete("{Id:long}")]
-        public void DeleteProduct(long Id)
+        public async Task DeleteProduct(long Id)
         {
-            if(dbContext.Products.Find(Id) == null)
-            {
-                //RedirectToRoute("api/products");
-                //RedirectToAction("GetProducts", "ProductsController");
-            }
-            else
-            {
-                dbContext.Products.Remove(dbContext.Products.Find(Id));
-                dbContext.SaveChanges();
-            }
+            dbContext.Products.Remove(dbContext.Products.Find(Id));
+            await dbContext.SaveChangesAsync();
         }
     }
 }

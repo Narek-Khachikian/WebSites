@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore.SqlServer;
 using WebApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WebApp
 {
@@ -34,8 +35,14 @@ namespace WebApp
                 opt.EnableSensitiveDataLogging(true);
             });
 
-
             services.AddControllers();
+
+            services.Configure<JsonOptions>(config =>
+            {
+                config.JsonSerializerOptions.IgnoreNullValues = true;
+            });
+
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
