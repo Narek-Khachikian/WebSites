@@ -36,30 +36,7 @@ namespace WebApp
                 opt.EnableSensitiveDataLogging(true);
             });
 
-            services.AddControllers().AddNewtonsoftJson().AddXmlSerializerFormatters();
-
-            services.Configure<MvcOptions>(config =>
-            {
-                config.RespectBrowserAcceptHeader = true;
-                config.ReturnHttpNotAcceptable = true;
-            });
-
-            services.Configure<MvcNewtonsoftJsonOptions>(config =>
-            {
-                config.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
-            });
-
-            //services.Configure<JsonOptions>(config =>
-            //{
-            //    config.JsonSerializerOptions.IgnoreNullValues = true;
-            //});
-
-            //services.AddCors();
-
-            services.AddSwaggerGen(config =>
-            {
-                config.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApp", Version = "v1" });
-            });
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -69,30 +46,19 @@ namespace WebApp
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseStaticFiles();
             app.UseRouting();
 
-            app.UseMiddleware<TestMiddleware>();
-            
             
 
             app.UseEndpoints(endpoints =>
             {
-                //endpoints.MapWebService();
-
                 endpoints.MapGet("/", async context =>
                 {
                     await context.Response.WriteAsync("Hello World!");
                 });
 
                 endpoints.MapControllers();
-
-            });
-
-            app.UseSwagger();
-            app.UseSwaggerUI(opt =>
-            {
-                opt.SwaggerEndpoint("/swagger/v1/swagger.json", "WebApp");
             });
 
             SeedData.SeedDatabase(dbContext);
