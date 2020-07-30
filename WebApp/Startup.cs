@@ -13,6 +13,7 @@ using WebApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
 
 namespace WebApp
 {
@@ -35,14 +36,30 @@ namespace WebApp
                 opt.EnableSensitiveDataLogging(true);
             });
 
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson().AddXmlSerializerFormatters();
 
-            services.Configure<JsonOptions>(config =>
+            services.Configure<MvcOptions>(config =>
             {
-                config.JsonSerializerOptions.IgnoreNullValues = true;
+                config.RespectBrowserAcceptHeader = true;
+                config.ReturnHttpNotAcceptable = true;
             });
 
-            services.AddCors();
+            services.Configure<MvcNewtonsoftJsonOptions>(config =>
+            {
+                config.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+            });
+
+            //services.Configure<JsonOptions>(config =>
+            //{
+            //    config.JsonSerializerOptions.IgnoreNullValues = true;
+            //});
+
+            //services.AddCors();
+
+            services.AddSwaggerGen(config =>
+            {
+                config.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApp", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -70,6 +87,12 @@ namespace WebApp
 
                 endpoints.MapControllers();
 
+            });
+
+            app.UseSwagger();
+            app.UseSwaggerUI(opt =>
+            {
+                opt.SwaggerEndpoint("/swagger/v1/swagger.json", "WebApp");
             });
 
             SeedData.SeedDatabase(dbContext);

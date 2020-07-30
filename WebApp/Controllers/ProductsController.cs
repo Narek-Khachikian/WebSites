@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using WebApp.Models;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Http;
 
 namespace WebApp.Controllers
 {
@@ -27,6 +28,8 @@ namespace WebApp.Controllers
         }
 
         [HttpGet("{Id:long}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetProduct(long Id)
         {
             Product p = await dbContext.Products.FindAsync(Id);
@@ -44,6 +47,8 @@ namespace WebApp.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> PostProduct(ProductBindingTarget target)
         {
             if (ModelState.IsValid)
