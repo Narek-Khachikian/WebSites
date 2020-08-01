@@ -19,6 +19,7 @@ namespace WebApp.Controllers
 
         public async Task<IActionResult> Index(long id=1)
         {
+            ViewBag.AvragePrice = await dbContext.Products.AverageAsync(p => p.Price);
             return View(await dbContext.Products.FindAsync(id));
         }
 

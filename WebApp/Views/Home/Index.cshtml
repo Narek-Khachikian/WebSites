@@ -1,28 +1,39 @@
 ﻿@model Product
-<!DOCTYPE html>
-<html>
-<head>
-    <link href="/lib/twitter-bootstrap/css/bootstrap.css" rel="stylesheet" />
-</head>
-<body>
-    <h6 class="bg-primary text-white text-center m-2 p-2">Product Table</h6>
-    <div class="m-2">
-        <table class="table table-striped table-bordered p-2" data-id="@Model.ProductId">
-            <thead>
-                <tr><th class="col-3">Name</th><th class="col-2">Price</th><th class="col-3">CategoryId</th></tr>
-            </thead>
-            <tbody>
-                <tr><th>@if (Model.Price > 200)
-                {
-                    @:Loxury @Model.Name
-                }
-                else
-                {
-                    @:Basic @Model.Name
-                }
-                    </th><td>@Model.Price.ToString("c")</td><th>@Model.CategoryId</th></tr>
-            </tbody>
-        </table>
-    </div>
-</body>
-</html>
+@{
+    ViewBag.Title = "Product #" + Model.ProductId.ToString();
+}
+
+@section Header{
+    Product Information #@Model.ProductId.ToString()
+}
+
+
+<div class="m-2">
+    <table class="table table-striped table-bordered p-2" data-id="@Model.ProductId">
+        <thead>
+            <tr><th>Name</th><th>Price</th><th>Avrage change</th><th>CategoryId</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    @if (Model.Price > 200)
+                    {
+                        @:Loxury @Model.Name
+                    }
+                    else
+                    {
+                        @:Basic @Model.Name
+                    }
+                </td>
+                <td>@Model.Price.ToString("c")</td>
+                <td>@(((decimal)ViewBag.AvragePrice * 100/Model.Price).ToString("n2")) %</td>
+                <td>@Model.CategoryId</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+@section Footer{
+    @(((Model.Price / ViewBag.AvragePrice)
+* 100).ToString("F2"))% of average price
+}

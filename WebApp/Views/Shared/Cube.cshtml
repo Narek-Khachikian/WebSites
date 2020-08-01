@@ -1,0 +1,26 @@
+﻿@{ 
+    Layout = "_ImportantLayout";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cube Calculator</title>
+    <link href="/lib/twitter-bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <h6 class="bg-secondary text-white text-center m-2 p-2">Cube</h6>
+    <form method="get" action="/cube/cube" class="m-2">
+        <div class="form-group">
+            <label>Number</label>
+            <input name="num" class="form-control w-25" value="@(TempData["Num"])" />
+        </div>
+        <button class="btn btn-primary" type="submit">Submit</button>
+    </form>
+    @if (TempData["Value"] != null)
+    {
+        <div class="bg-info text-white m-2 p-2">
+            The cube of @TempData["Num"] is @TempData["Value"]
+        </div>
+    }
+</body>
+</html>
