@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace WebApp
 {
@@ -39,11 +40,17 @@ namespace WebApp
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddRazorPages().AddRazorRuntimeCompilation();
 
-            //services.AddDistributedMemoryCache();
+            services.AddDistributedMemoryCache();
             services.AddSession(opt =>
             {
                 opt.Cookie.IsEssential = true;
             });
+
+            services.Configure<RazorPagesOptions>(opts => {
+                opts.Conventions.AddPageRoute("/Index", "/extra/page/{id:long?}");
+            });
+
+            services.AddSingleton<CityData>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
