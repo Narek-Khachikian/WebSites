@@ -37,3 +37,11 @@
     @(((Model.Price / ViewBag.AvragePrice)
 * 100).ToString("F2"))% of average price
 }
+
+@section Summary{
+    <div class="bg-info text-white m-2 p-2">
+        <vc:city-summery them-name="danger"/>
+
+    </div>
+    <vc:page-size/>
+}
