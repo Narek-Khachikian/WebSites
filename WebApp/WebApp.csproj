@@ -46,4 +46,8 @@
     <None Include="wwwroot\lib\twitter-bootstrap\js\bootstrap.min.js.map" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\Images\" />
+  </ItemGroup>
+
 </Project>
