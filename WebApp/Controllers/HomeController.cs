@@ -32,6 +32,5 @@ namespace WebApp.Controllers
         {
             return View(await dbContext.Products.ToArrayAsync());
         }
-
     }
 }
