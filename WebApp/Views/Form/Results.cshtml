@@ -16,4 +16,14 @@
         }
     </tbody>
 </table>
-<a class="btn btn-primary" asp-action="Index">Return</a>
+<a class="btn btn-primary" asp-action="Index" asp-route-id="@temp()">Return</a>
+
+
+@functions{
+
+    public string temp()
+    {
+        TempData.Keep("ItemId");
+        return TempData["ItemId"].ToString();
+    }
+}

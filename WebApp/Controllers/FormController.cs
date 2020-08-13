@@ -5,9 +5,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebApp.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Principal;
+
 
 namespace WebApp.Controllers
 {
+    [AutoValidateAntiforgeryToken]
     public class FormController : Controller
     {
         private DataContext dbContext;
@@ -16,19 +19,20 @@ namespace WebApp.Controllers
             dbContext = ctx;
         }
 
-        public async Task<IActionResult> Index(long id)
+        public async Task<IActionResult> Index(long? id = 1)
         {
-            return View("Form", await dbContext.Products.Include(p=>p.Category).Include(p=>p.Supplier).FirstAsync(p=>p.ProductId == id));
+            return View("Form", await dbContext.Products.Include(p=>p.Category).Include(p=>p.Supplier).FirstOrDefaultAsync(p=>p.ProductId == id));
         }
 
-        [HttpPost,AutoValidateAntiforgeryToken]
-        public IActionResult SubmitForm()
+        [HttpPost]
+        public IActionResult SubmitForm(Product product)
         {
-            foreach (string key in Request.Form.Keys
-            )
-            {
-                TempData[key] = string.Join(", ", Request.Form[key]);
-            }
+            TempData["ItemId"] = product.ProductId.ToString();
+            TempData["name"] = product.Name;
+            TempData["price"] = product.Price.ToString();
+            TempData["categoryId"] = product.CategoryId.ToString();
+            TempData["supplierId"] = product.SupplierId.ToString();
+            
             return RedirectToAction(nameof(Results));
         }
 

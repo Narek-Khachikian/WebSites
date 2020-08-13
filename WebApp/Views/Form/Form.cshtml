@@ -1,12 +1,9 @@
 ﻿@model Product
 @{ Layout = "_SimpleLayout"; }
-
 <h5 class="bg-primary text-white text-center p-2">HTML Form</h5>
-
-<form asp-action="SubmitForm" id="htmlForm" method="post">
+<form asp-action="submitform" method="post" id="htmlform">
     <div>
-        <label>Id</label>
-        <input asp-for="ProductId" class="form-control" />
+        <input asp-for="ProductId" hidden />
     </div>
     <div class="form-group">
         <label asp-for="Name"></label>
@@ -17,13 +14,12 @@
         <input class="form-control" asp-for="Price" />
     </div>
     <div class="form-group">
-        <label >Category Name</label>
-        <input asp-for="Category.Name" class="form-control"/>
+        <label>CategoryId</label>
+        <input class="form-control" asp-for="CategoryId" />
     </div>
     <div class="form-group">
-        <label>Supplier Name</label>
-        <input asp-for="Supplier.Name" class="form-control" />
+        <label>SupplierId</label>
+        <input class="form-control" asp-for="SupplierId" />
     </div>
-    
+    <button type="submit" class="btn btn-primary">Submit</button>
 </form>
-<button form="htmlForm" asp-action="SubmitForm" type="submit" class="btn btn-primary">Submit(out)</button>

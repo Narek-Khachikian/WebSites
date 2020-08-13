@@ -52,7 +52,7 @@ namespace WebApp
             }
             app.UseStaticFiles();
             app.UseRouting();
-
+            
 
             app.UseEndpoints(endpoints =>
             {
@@ -60,7 +60,6 @@ namespace WebApp
                 endpoints.MapControllerRoute("forms","controllers/{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapDefaultControllerRoute();
                 endpoints.MapRazorPages();
-                
             });
 
             SeedData.SeedDatabase(dbContext);
