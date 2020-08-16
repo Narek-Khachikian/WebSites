@@ -41,6 +41,9 @@ namespace WebApp
             services.AddRazorPages().AddRazorRuntimeCompilation();
 
             services.AddSingleton<CityData>();
+
+            services.Configure<MvcOptions>(opts => opts.ModelBindingMessageProvider
+            .SetValueMustNotBeNullAccessor(value => $" Must not be empty"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
