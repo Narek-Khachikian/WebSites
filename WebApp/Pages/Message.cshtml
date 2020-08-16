@@ -1,0 +1,35 @@
+﻿@page "/pages/message"
+@model MessageModel
+@using System.Collections.Generic;
+@functions{
+    public class MessageModel : PageModel
+    {
+        public object Message { get; set; } = "This is the Message from the Pages";
+    }
+}
+
+@if(Model.Message is string str)
+{
+    <p>@str</p>
+}else if(Model.Message is IDictionary<string,string> dictionary)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (KeyValuePair<string, string> pair in dictionary)
+            {
+                <tr>
+                    <td>@pair.Key</td>
+                    <td>@pair.Value</td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+}
+

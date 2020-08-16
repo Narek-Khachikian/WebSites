@@ -1,36 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WebApp.Models;
 
 namespace WebApp.Controllers
 {
-    public class HomeController:Controller
+    public class HomeController : Controller
     {
-        private DataContext dbContext;
-
-        public HomeController(DataContext ctx)
+        public IActionResult Index()
         {
-            dbContext = ctx;
-        }
-
-        public async Task<IActionResult> Index(long id=1)
-        {
-            ViewBag.AvragePrice = await dbContext.Products.AverageAsync(p => p.Price);
-            return View(await dbContext.Products.FindAsync(id));
-        }
-
-        public IActionResult Common()
-        {
-            return View();
-        }
-
-        public async Task<IActionResult> List()
-        {
-            return View(await dbContext.Products.ToArrayAsync());
+            return View("Message", "This is the Index action on Home controller");
         }
     }
 }
