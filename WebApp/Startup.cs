@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using WebApp.Filters;
 
 namespace WebApp
 {
@@ -44,6 +45,8 @@ namespace WebApp
 
             services.Configure<MvcOptions>(opts => opts.ModelBindingMessageProvider
             .SetValueMustNotBeNullAccessor(value => $" Must not be empty"));
+
+            services.AddScoped<GuidResponseAttribute>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

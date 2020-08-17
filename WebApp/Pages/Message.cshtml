@@ -1,10 +1,21 @@
 ﻿@page "/pages/message"
 @model MessageModel
 @using System.Collections.Generic;
-@functions{
+@using WebApp.Filters;
+@functions
+{
+    [ChangePageArg()]
     public class MessageModel : PageModel
     {
-        public object Message { get; set; } = "This is the Message from the Pages";
+
+
+        public object Message { get; set; } = $"{DateTime.Now.ToLongTimeString()} This is the Message from the Pages";
+
+        public void OnGet(string message1, string message2 = "Bla-bla-bla")
+        {
+            Message = $"{message1} and {message2}";
+        }
+
     }
 }
 
