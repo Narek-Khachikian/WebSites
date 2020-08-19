@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Identity;
 
 namespace Advanced
 {
@@ -34,6 +35,19 @@ namespace Advanced
 
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddRazorPages().AddRazorRuntimeCompilation();
+
+            services.AddDbContext<IdentityContext>(opt =>
+            {
+                opt.UseSqlServer(Configuration["ConnectionStrings:IdentityDatabase"]);
+            });
+            services.AddIdentity<IdentityUser, IdentityRole>(opt => 
+            {
+                opt.Password.RequireDigit = true;
+                opt.Password.RequiredLength = 10;
+                opt.Password.RequireLowercase = true;
+                opt.Password.RequireNonAlphanumeric = true;
+                opt.Password.RequireUppercase = true;
+            }).AddEntityFrameworkStores<IdentityContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -48,7 +62,7 @@ namespace Advanced
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute("default", "controllers/{controller=Home}/{action=Index}/{id:long?}");
+                endpoints.MapControllerRoute("default", "controllers/{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapDefaultControllerRoute();
                 endpoints.MapRazorPages();
             });

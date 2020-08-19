@@ -1,0 +1,28 @@
+﻿@{ Layout = "_UserLayout"; }
+@model  UserEditingViewModel
+
+<h5 class="bg-warning text-white text-center p-2">Edit User</h5>
+<form name="EditModel" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="@Model.Id"></label>
+        <input asp-for="@Model.Id" class="form-control" disabled />
+        <input asp-for="Id" hidden />
+    </div>
+    <div class="form-group">
+        <label asp-for="@Model.UserName"></label>
+        <span asp-validation-for="@Model.UserName"></span>
+        <input asp-for="@Model.UserName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Email"></label>
+        <span asp-validation-for="Email"></span>
+        <input asp-for="Email" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>New Password</label>
+        <input asp-for="Password" class="form-control" type="password" value="@(Model.Password != null? Model.Password : "")" />
+    </div>
+    <button type="submit" class="btn btn-warning">Submit</button>
+    <a class="btn btn-secondary" asp-action="UserList">Back</a>
+</form>
