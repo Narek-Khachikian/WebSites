@@ -42,10 +42,10 @@ namespace Advanced
             });
             services.AddIdentity<IdentityUser, IdentityRole>(opt => 
             {
-                opt.Password.RequireDigit = true;
-                opt.Password.RequiredLength = 10;
+                opt.Password.RequireDigit = false;
+                opt.Password.RequiredLength = 6;
                 opt.Password.RequireLowercase = true;
-                opt.Password.RequireNonAlphanumeric = true;
+                opt.Password.RequireNonAlphanumeric = false;
                 opt.Password.RequireUppercase = true;
             }).AddEntityFrameworkStores<IdentityContext>();
         }
@@ -59,7 +59,8 @@ namespace Advanced
             }
             app.UseStaticFiles();
             app.UseRouting();
-
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute("default", "controllers/{controller=Home}/{action=Index}/{id?}");
@@ -68,6 +69,7 @@ namespace Advanced
             });
 
             SeedData.SeedDatabase(dbContext);
+            IdentitySeedData.CreateAdminAccount(app.ApplicationServices, Configuration);
         }
     }
 }

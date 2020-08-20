@@ -6,9 +6,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Advanced.Models.ViewModels;
 using Advanced.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Advanced.Controllers
 {
+    [Authorize(Roles ="Admins")]
     public class AdminController : Controller
     {
         public UserManager<IdentityUser> UserManager;

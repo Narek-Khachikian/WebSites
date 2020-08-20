@@ -5,9 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Advanced.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Advanced.Controllers
 {
+    [Authorize(Roles ="Admins")]
     public class RolesController : Controller
     {
         public RoleManager<IdentityRole> RoleManager { get; set; }
